@@ -1,0 +1,31 @@
+{
+  "name": "farm-builder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Farm Builder — Telegram Bot + Mini App MVP starter",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "npm run build:miniapp && tsc",
+    "build:miniapp": "vite build --config miniapp/vite.config.ts",
+    "start": "node dist/index.js",
+    "set-webhook": "tsx scripts/set-webhook.ts",
+    "setup:telegram": "tsx scripts/setup-telegram.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "grammy": "^1.35.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}

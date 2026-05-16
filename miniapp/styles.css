@@ -1,0 +1,53 @@
+:root {
+  --tg-bg: var(--tg-theme-bg-color, #1a2e1a);
+  --tg-text: var(--tg-theme-text-color, #f0f4e8);
+  --tg-button: var(--tg-theme-button-color, #5cb85c);
+  --tg-button-text: var(--tg-theme-button-text-color, #fff);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--tg-bg);
+  color: var(--tg-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  padding-bottom: 80px;
+}
+
+.hud {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+#farm {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #87ceeb 0%, #87ceeb 35%, #6b8e4e 35%, #4a7c3f 100%);
+  touch-action: manipulation;
+}
+
+.hint {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  text-align: center;
+  max-width: 320px;
+}

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: farm-builder
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AUTO_SETUP_TELEGRAM
+        value: "true"
+      - key: BOT_TOKEN
+        sync: false
+      - key: BOT_USERNAME
+        value: MyFarmBuilderBot
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: WEBAPP_URL
+        fromService:
+          type: web
+          name: farm-builder
+          property: host
+      - key: MINI_APP_SHORT_NAME
+        value: farm
+      - key: DATABASE_PATH
+        value: ./data/farm.json
