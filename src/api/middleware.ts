@@ -22,7 +22,7 @@ export function requireTelegramAuth(
     return;
   }
 
-  const validated = validateInitData(initData, config.botToken);
+  const validated = validateInitData(initData, config.botToken.trim());
   if (!validated) {
     res.status(401).json({ error: "invalid_init_data" });
     return;

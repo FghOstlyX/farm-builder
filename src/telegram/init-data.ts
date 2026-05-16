@@ -22,7 +22,8 @@ export function validateInitData(
   botToken: string,
   maxAgeSeconds = 86_400,
 ): ValidatedInitData | null {
-  const params = new URLSearchParams(initData);
+  const token = botToken.trim();
+  const params = new URLSearchParams(initData.trim());
   const hash = params.get("hash");
   if (!hash) return null;
 
@@ -32,9 +33,7 @@ export function validateInitData(
   );
   const dataCheckString = entries.map(([k, v]) => `${k}=${v}`).join("\n");
 
-  const secretKey = createHmac("sha256", "WebAppData")
-    .update(botToken)
-    .digest();
+  const secretKey = createHmac("sha256", "WebAppData").update(token).digest();
 
   const calculated = createHmac("sha256", secretKey)
     .update(dataCheckString)

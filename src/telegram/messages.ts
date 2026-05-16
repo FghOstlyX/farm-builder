@@ -2,43 +2,47 @@ import type { FarmSnapshot } from "../game/logic.js";
 import { shareLinkForUser } from "./keyboards.js";
 
 export const WELCOME_CAPTION =
-  "Строй ферму, выращивай урожай, зарабатывай монеты.\n\n" +
-  "Построй склад, посади морковь — через 30 секунд собери урожай и получи первые монеты.";
+  "Строй ферму, выращивай урожай, продавай на рынке.\n\n" +
+  "Открой Mini App: посади культуру, собери урожай на склад, развивай хозяйство.";
 
 export function balanceText(snapshot: FarmSnapshot): string {
+  const plot = plotLabel(snapshot);
+  const stock = Object.entries(snapshot.inventory)
+    .filter(([, n]) => n > 0)
+    .map(([id, n]) => `${id}×${n}`)
+    .join(", ");
   return (
-    `💰 Баланс: *${snapshot.coins}* монет\n` +
-    `🏚 Склад: ${snapshot.hasWarehouse ? "построен" : "нет"}\n` +
-    `🥕 Урожай: ${cropStatusLabel(snapshot)}`
+    `💰 *${snapshot.coins}* монет\n` +
+    `🏚 Склад: ${snapshot.hasWarehouse ? "есть" : "нет"}\n` +
+    `🌱 Грядка: ${plot}\n` +
+    (stock ? `📦 Запасы: ${stock}` : "📦 Запасы: пусто")
   );
 }
 
-function cropStatusLabel(s: FarmSnapshot): string {
-  switch (s.cropStatus) {
-    case "empty":
-      return "грядка пуста";
-    case "growing":
-      return `растёт (${Math.ceil(s.growRemainingMs / 1000)} сек)`;
-    case "ready":
-      return "готов к сбору!";
+function plotLabel(s: FarmSnapshot): string {
+  const p = s.plot;
+  if (p.status === "empty") return "пусто";
+  if (p.status === "growing") {
+    return `${p.emoji ?? ""} ${p.cropName} (${Math.ceil(p.growRemainingMs / 1000)}с)`;
   }
+  return `${p.emoji ?? ""} ${p.cropName} — созрело!`;
 }
 
-export function dailyReport(snapshot: FarmSnapshot, harvestedCoins: number): string {
+export function dailyReport(snapshot: FarmSnapshot): string {
   return (
     `📊 *Ежедневный отчёт*\n` +
-    `Сегодня собрано: ${snapshot.carrotsHarvestedToday} морковок\n` +
-    `Заработано: ${harvestedCoins} монет`
+    `Собрано сегодня: ${snapshot.harvestedToday} урожаев\n` +
+    `💰 Баланс: ${snapshot.coins} монет`
   );
 }
 
 export function harvestReadyText(): string {
-  return "🥕 *Урожай готов!* Морковь созрела — собери урожай на ферме.";
+  return "🌾 *Урожай готов!* Зайди на ферму и собери урожай.";
 }
 
 export function shareHint(userId: number): string {
   return (
-    `Пригласи друга — он получит стартовый бонус:\n` +
+    `Пригласи друга — стартовый бонус:\n` +
     `\`${shareLinkForUser(userId)}\``
   );
 }

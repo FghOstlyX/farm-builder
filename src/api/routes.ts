@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { FarmRepository } from "../game/repository.js";
-import { toSnapshot, GAME } from "../game/logic.js";
+import { toSnapshot, shopCatalog, GAME } from "../game/logic.js";
 import { config } from "../config.js";
 import { requireTelegramAuth, type AuthedRequest } from "./middleware.js";
 import { shareLinkForUser } from "../telegram/keyboards.js";
@@ -23,13 +23,21 @@ export function createApiRouter(farms: FarmRepository): Router {
     res.json({
       userId,
       farm: toSnapshot(row),
+      shop: shopCatalog(row),
       shareLink: shareLinkForUser(userId),
       referralBonus: config.referralBonusCoins,
-      costs: {
-        warehouse: GAME.warehouseCost,
-        carrotGrowMs: GAME.carrotGrowMs,
-      },
+      costs: { warehouse: GAME.warehouseCost },
     });
+  });
+
+  router.post("/select-crop", requireTelegramAuth, (req: AuthedRequest, res) => {
+    const cropId = String(req.body?.cropId ?? "");
+    const result = farms.selectCrop(req.telegramUserId!, cropId);
+    if (!result.ok) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json({ farm: toSnapshot(result.row), shop: shopCatalog(result.row) });
   });
 
   router.post("/build/warehouse", requireTelegramAuth, (req: AuthedRequest, res) => {
@@ -38,19 +46,17 @@ export function createApiRouter(farms: FarmRepository): Router {
       res.status(400).json({ error: result.error });
       return;
     }
-    res.json({ farm: toSnapshot(result.row) });
+    res.json({ farm: toSnapshot(result.row), shop: shopCatalog(result.row) });
   });
 
-  router.post("/plant/carrot", requireTelegramAuth, (req: AuthedRequest, res) => {
-    const result = farms.plantCarrot(req.telegramUserId!);
+  router.post("/plant", requireTelegramAuth, (req: AuthedRequest, res) => {
+    const cropId = req.body?.cropId ? String(req.body.cropId) : undefined;
+    const result = farms.plant(req.telegramUserId!, cropId);
     if (!result.ok) {
       res.status(400).json({ error: result.error });
       return;
     }
-    res.json({
-      farm: toSnapshot(result.row),
-      readyAt: Date.now() + GAME.carrotGrowMs,
-    });
+    res.json({ farm: toSnapshot(result.row), shop: shopCatalog(result.row) });
   });
 
   router.post("/harvest", requireTelegramAuth, (req: AuthedRequest, res) => {
@@ -59,7 +65,36 @@ export function createApiRouter(farms: FarmRepository): Router {
       res.status(400).json({ error: result.error });
       return;
     }
-    res.json({ farm: toSnapshot(result.row), reward: result.reward });
+    res.json({
+      farm: toSnapshot(result.row),
+      shop: shopCatalog(result.row),
+      cropId: result.cropId,
+      amount: result.amount,
+    });
+  });
+
+  router.post("/shop/unlock", requireTelegramAuth, (req: AuthedRequest, res) => {
+    const result = farms.unlockCrop(req.telegramUserId!, String(req.body?.cropId ?? ""));
+    if (!result.ok) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json({ farm: toSnapshot(result.row), shop: shopCatalog(result.row) });
+  });
+
+  router.post("/shop/sell", requireTelegramAuth, (req: AuthedRequest, res) => {
+    const cropId = String(req.body?.cropId ?? "");
+    const qty = Math.max(1, Number(req.body?.qty ?? 1));
+    const result = farms.sellCrop(req.telegramUserId!, cropId, qty);
+    if (!result.ok) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json({
+      farm: toSnapshot(result.row),
+      shop: shopCatalog(result.row),
+      earned: result.earned,
+    });
   });
 
   return router;

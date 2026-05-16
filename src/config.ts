@@ -15,7 +15,7 @@ function resolveWebappUrl(): string {
 }
 
 export const config = {
-  botToken: env("BOT_TOKEN"),
+  botToken: env("BOT_TOKEN").trim(),
   botUsername: env("BOT_USERNAME", "farmbuilderbot"),
   webappUrl: resolveWebappUrl(),
   webhookSecret: env("WEBHOOK_SECRET", "dev-secret"),

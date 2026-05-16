@@ -94,7 +94,7 @@ export function createBot(token: string, farms: FarmRepository): Bot {
 
     const snap = toSnapshot(result.row);
     await ctx.reply(
-      `✅ Собрано! +${result.reward} монет\n\n${balanceText(snap)}`,
+      `✅ В склад: +${result.amount} ${result.cropId}\n\n${balanceText(snap)}`,
       { parse_mode: "Markdown", reply_markup: openFarmKeyboard() },
     );
   });
@@ -142,7 +142,7 @@ export function createBot(token: string, farms: FarmRepository): Bot {
     if (!userId) return;
     await ctx.answerCallbackQuery();
     const row = farms.ensure(userId);
-    await ctx.reply(dailyReport(toSnapshot(row), 0), {
+    await ctx.reply(dailyReport(toSnapshot(row)), {
       parse_mode: "Markdown",
       reply_markup: launchFarmKeyboard(),
     });

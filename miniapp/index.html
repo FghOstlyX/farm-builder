@@ -4,19 +4,76 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>Farm Builder</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
-    <div id="app">
-      <header class="hud">
-        <span id="coins">💰 0</span>
-        <span id="status">Загрузка...</span>
+    <div id="loader" class="loader">
+      <div class="loader-card">
+        <div class="loader-icon">🌾</div>
+        <p class="loader-title">Загружаем ферму</p>
+        <p class="loader-sub" id="loader-hint">Подключаемся к серверу…</p>
+      </div>
+    </div>
+
+    <div id="shell" class="shell hidden">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-emoji">🚜</span>
+          <span class="brand-name">Farm Builder</span>
+        </div>
+        <div class="balance-pill">
+          <span id="coins">💰 0</span>
+        </div>
       </header>
-      <canvas id="farm" width="360" height="280"></canvas>
-      <p class="hint">Тап по грядке — посадить. Тап по складу — построить.</p>
-    <script type="module" src="/main.ts"></script>
+
+      <main class="pages">
+        <section id="page-farm" class="page active">
+          <div class="farm-scene">
+            <div class="sky"></div>
+            <div class="field">
+              <button type="button" class="plot-card" id="plot-card">
+                <span class="plot-emoji" id="plot-emoji">🌱</span>
+                <span class="plot-title" id="plot-title">Грядка</span>
+                <span class="plot-sub" id="plot-sub">Свободна</span>
+                <div class="progress"><div class="progress-bar" id="plot-progress"></div></div>
+              </button>
+              <button type="button" class="warehouse-card" id="warehouse-card">
+                <span>🏚</span>
+                <span id="warehouse-label">Склад</span>
+              </button>
+            </div>
+          </div>
+          <p class="page-hint" id="farm-hint"></p>
+        </section>
+
+        <section id="page-garden" class="page">
+          <h2 class="page-title">Что посадить?</h2>
+          <div id="crop-list" class="card-list"></div>
+        </section>
+
+        <section id="page-warehouse" class="page">
+          <h2 class="page-title">Склад урожая</h2>
+          <div id="stock-list" class="card-list"></div>
+        </section>
+
+        <section id="page-shop" class="page">
+          <h2 class="page-title">Рынок</h2>
+          <p class="page-hint">Разблокируйте культуры и продавайте урожай со склада.</p>
+          <div id="shop-list" class="card-list"></div>
+        </section>
+      </main>
+
+      <nav class="tabbar">
+        <button type="button" class="tab active" data-tab="farm">🌾 Ферма</button>
+        <button type="button" class="tab" data-tab="garden">🌱 Сад</button>
+        <button type="button" class="tab" data-tab="warehouse">🏚 Склад</button>
+        <button type="button" class="tab" data-tab="shop">🛒 Рынок</button>
+      </nav>
+    </div>
+
+    <script type="module" src="/app.ts"></script>
   </body>
 </html>

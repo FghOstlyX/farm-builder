@@ -5,11 +5,17 @@ export interface FarmRow {
   user_id: number;
   coins: number;
   has_warehouse: number;
-  carrot_planted_at: number | null;
-  carrots_harvested_today: number;
+  planted_crop: string | null;
+  planted_at: number | null;
+  inventory: Record<string, number>;
+  unlocked_crops: string[];
+  selected_crop: string;
+  harvested_today: number;
   last_daily_reset: string;
   referred_by: number | null;
   created_at: string;
+  /** @deprecated legacy */
+  carrot_planted_at?: number | null;
 }
 
 interface DbFile {
@@ -55,12 +61,12 @@ export class JsonStore {
     this.save();
   }
 
-  listGrowingFarms(): { user_id: number; carrot_planted_at: number }[] {
+  listGrowingFarms(): { user_id: number; planted_at: number }[] {
     return Object.values(this.data.farms)
-      .filter((f) => f.carrot_planted_at != null)
+      .filter((f) => f.planted_at != null)
       .map((f) => ({
         user_id: f.user_id,
-        carrot_planted_at: f.carrot_planted_at!,
+        planted_at: f.planted_at!,
       }));
   }
 }

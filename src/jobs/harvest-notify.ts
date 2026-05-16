@@ -1,28 +1,25 @@
 import type { Bot } from "grammy";
 import type { JsonStore } from "../db/store.js";
-import { GAME } from "../game/logic.js";
+import { FarmRepository } from "../game/repository.js";
 import { notifyHarvestReady } from "../telegram/bot.js";
 
 const notified = new Set<string>();
 
-/** MVP: poll store and ping users when carrots are ready */
 export function startHarvestNotifier(bot: Bot, store: JsonStore): void {
+  const farms = new FarmRepository(store);
   const intervalMs = 15_000;
 
   setInterval(() => {
-    const rows = store.listGrowingFarms();
-    const now = Date.now();
+    for (const { user_id, planted_at } of store.listGrowingFarms()) {
+      const row = farms.get(user_id);
+      if (!row || !farms.isReadyForNotify(row)) continue;
 
-    for (const row of rows) {
-      const elapsed = now - row.carrot_planted_at;
-      if (elapsed < GAME.carrotGrowMs) continue;
-
-      const key = `${row.user_id}:${row.carrot_planted_at}`;
+      const key = `${user_id}:${planted_at}`;
       if (notified.has(key)) continue;
       notified.add(key);
 
-      notifyHarvestReady(bot, row.user_id).catch((err) => {
-        console.warn(`Harvest notify failed for ${row.user_id}:`, err);
+      notifyHarvestReady(bot, user_id).catch((err) => {
+        console.warn(`Harvest notify failed for ${user_id}:`, err);
         notified.delete(key);
       });
     }
