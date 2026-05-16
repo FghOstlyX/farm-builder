@@ -3,7 +3,7 @@ services:
     name: farm-builder
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
@@ -18,10 +18,7 @@ services:
       - key: WEBHOOK_SECRET
         generateValue: true
       - key: WEBAPP_URL
-        fromService:
-          type: web
-          name: farm-builder
-          property: host
+        value: https://farm-builder.onrender.com
       - key: MINI_APP_SHORT_NAME
         value: farm
       - key: DATABASE_PATH
